@@ -42,11 +42,7 @@ function CheckIcon({ className = "" }) {
       stroke="currentColor"
       strokeWidth="2.5"
     >
-      <path
-        d="M20 6 9 17l-5-5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -62,11 +58,7 @@ function CrossIcon({ className = "" }) {
       stroke="currentColor"
       strokeWidth="2.5"
     >
-      <path
-        d="M18 6 6 18M6 6l12 12"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -82,35 +74,78 @@ function ArrowUpRightIcon({ className = "" }) {
       stroke="currentColor"
       strokeWidth="2.5"
     >
-      <path
-        d="M7 17 17 7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 7h8v8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M7 17 17 7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 7h8v8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
+// Animations utilitaires
+const headerWrap = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
+
+const headerItem = {
+  hidden: { opacity: 0, y: 16, filter: "blur(6px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
+const floatCard = (i = 0) => ({
+  y: [0, -8 - i * 2, 0],
+  rotate: [0, i % 2 === 0 ? -0.8 : 0.8, 0],
+  transition: {
+    duration: 4.8 + i * 0.7,
+    repeat: Infinity,
+    ease: "easeInOut",
+    delay: i * 0.18,
+  },
+});
+
 export default function PricingSection() {
   return (
-    <section className="bg-white py-20 md:py-24">
+    <section className="bg-white py-20 md:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header (DA blanche, propre) */}
-        <div className="text-center">
-          <h2 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-gray-950">
+        {/* Header animée */}
+        <motion.div
+          className="text-center"
+          variants={headerWrap}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ amount: 0.6, once: true }}
+        >
+          <motion.h2
+            variants={headerItem}
+            className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-gray-950"
+          >
             Accédez à <span className="text-gray-950">FOCUS</span> dès
             <br />
             aujourd’hui
-          </h2>
-          <p className="mt-5 text-gray-600 text-base md:text-lg">
+          </motion.h2>
+
+          <motion.p variants={headerItem} className="mt-5 text-gray-600 text-base md:text-lg">
             Accédez à la communauté, aux ressources et aux replays.
-          </p>
-        </div>
+          </motion.p>
+
+          {/* Petit trait animé (remplit le vide sans surcharger) */}
+          <motion.div
+            variants={headerItem}
+            className="mx-auto mt-7 h-[3px] w-28 rounded-full bg-gray-950/10 overflow-hidden"
+          >
+            <motion.div
+              className="h-full w-1/2 rounded-full bg-gray-950/30"
+              initial={{ x: "-70%" }}
+              whileInView={{ x: "170%" }}
+              viewport={{ amount: 0.6, once: true }}
+              transition={{ duration: 1.1, ease: "easeInOut" }}
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Pricing grid */}
         <div className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -120,20 +155,34 @@ export default function PricingSection() {
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ amount: 0.35, once: true }}
-              transition={{ duration: 0.45, ease: "easeOut", delay: idx * 0.05 }}
-              whileHover={{ y: -4 }}
+              transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.06 }}
+              // ---- NOUVEAU: mouvement constant (pas statique) ----
+              animate={floatCard(idx)}
+              whileHover={{
+                y: -10,
+                rotate: idx === 0 ? -0.6 : 0.6,
+                transition: { duration: 0.25 },
+              }}
               className={[
-                "relative rounded-[28px] border bg-white overflow-hidden",
+                "relative rounded-[28px] border bg-white overflow-hidden will-change-transform",
                 "shadow-[0_18px_60px_rgba(0,0,0,0.08)]",
-                plan.popular
-                  ? "border-gray-200"
-                  : "border-gray-200/70",
+                plan.popular ? "border-gray-200" : "border-gray-200/70",
               ].join(" ")}
             >
               {/* subtle top glow for popular */}
               {plan.popular && (
                 <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-48 w-[520px] rounded-full bg-gradient-to-r from-fuchsia-200/70 via-sky-200/55 to-emerald-200/60 blur-3xl" />
               )}
+
+              {/* grain subtil (rend vivant sans perdre le côté vendeur) */}
+              <div
+                className="pointer-events-none absolute inset-0 opacity-[0.035]"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(rgba(0,0,0,0.8) 1px, transparent 1px)",
+                  backgroundSize: "18px 18px",
+                }}
+              />
 
               <div className="relative p-8 md:p-10">
                 {/* top badges */}
@@ -164,9 +213,13 @@ export default function PricingSection() {
                 </div>
 
                 <div className="mt-8 space-y-4">
-                  {plan.features.map((feature) => (
-                    <div
+                  {plan.features.map((feature, i) => (
+                    <motion.div
                       key={feature.text}
+                      initial={{ opacity: 0, x: -8 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ amount: 0.4, once: true }}
+                      transition={{ duration: 0.35, ease: "easeOut", delay: 0.05 + i * 0.04 }}
                       className={[
                         "flex items-start gap-3",
                         feature.included ? "text-gray-900" : "text-gray-400",
@@ -187,14 +240,18 @@ export default function PricingSection() {
                       <div className="text-[15px] md:text-base leading-relaxed">
                         {feature.text}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
 
                 {/* CTA */}
                 <div className="mt-10">
                   <motion.a
-                    href={plan.popular ? "https://espace.focus-business.com/checkout" : "https://discord.gg/Z8qWfPyYMY"}
+                    href={
+                      plan.popular
+                        ? "https://espace.focus-business.com/checkout"
+                        : "https://discord.gg/Z8qWfPyYMY"
+                    }
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     className={[
@@ -223,7 +280,6 @@ export default function PricingSection() {
                 </div>
               </div>
 
-              {/* bottom hairline */}
               <div className="h-px w-full bg-gray-200/60" />
             </motion.div>
           ))}

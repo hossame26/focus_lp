@@ -47,17 +47,45 @@ const cards = [
   },
 ];
 
+// Anim texte (se rejoue en descendant ET en remontant)
+const textWrap = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.03 } },
+};
+
+const textItem = {
+  hidden: { opacity: 0, y: 14, filter: "blur(6px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.55, ease: "easeOut" },
+  },
+};
+
 export default function FeaturesStack() {
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header (DA du site actuel: clair, propre, premium) */}
-        <div className="mb-16 md:mb-20">
-          <div className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 shadow-sm">
+        {/* Header (inchangé, mais animé au scroll) */}
+        <motion.div
+          className="mb-16 md:mb-20"
+          variants={textWrap}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ amount: 0.6, once: false }}
+        >
+          <motion.div
+            variants={textItem}
+            className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 shadow-sm"
+          >
             Votre groupe business
-          </div>
+          </motion.div>
 
-          <h2 className="mt-6 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-gray-950">
+          <motion.h2
+            variants={textItem}
+            className="mt-6 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-gray-950"
+          >
             Avec{" "}
             <span className="bg-gradient-to-r from-fuchsia-500 via-sky-400 to-emerald-300 bg-clip-text text-transparent">
               Focus
@@ -65,10 +93,10 @@ export default function FeaturesStack() {
             voici
             <br />
             ce que tu obtiens
-          </h2>
-        </div>
+          </motion.h2>
+        </motion.div>
 
-        {/* Stack sticky */}
+        {/* Stack sticky (conserve ton comportement “1 après l’autre” + inverse en remontant) */}
         <div className="relative">
           {cards.map((card, index) => (
             <div
@@ -78,7 +106,8 @@ export default function FeaturesStack() {
               <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ amount: 0.55 }}
+                // ✅ once:false pour rejouer dans l’autre sens quand tu remontes
+                viewport={{ amount: 0.55, once: false }}
                 transition={{ duration: 0.45, ease: "easeOut" }}
                 className="
                   w-full
@@ -95,31 +124,43 @@ export default function FeaturesStack() {
                   overflow-hidden
                 "
               >
-                {/* Fond très subtil (évite l’effet “gros chiffre sombre”) */}
+                {/* Fond subtil */}
                 <div className="pointer-events-none absolute inset-0">
                   <div className="absolute -top-40 -right-40 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-sky-200/60 via-white to-emerald-200/50 blur-3xl" />
                   <div className="absolute -bottom-48 -left-48 h-[520px] w-[520px] rounded-full bg-gradient-to-tr from-fuchsia-200/50 via-white to-sky-200/40 blur-3xl" />
                 </div>
 
-                {/* Col texte */}
-                <div className="flex-1 relative z-10">
+                {/* Col texte (animée au scroll, en séquence) */}
+                <motion.div
+                  className="flex-1 relative z-10"
+                  variants={textWrap}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ amount: 0.6, once: false }}
+                >
                   <div className="flex items-start gap-6">
-                    <div className="shrink-0">
+                    <motion.div variants={textItem} className="shrink-0">
                       <div className="text-5xl md:text-6xl font-semibold tracking-tight text-sky-500">
                         {card.id}
                       </div>
-                    </div>
+                    </motion.div>
 
                     <div>
-                      <h3 className="text-2xl md:text-4xl font-semibold tracking-tight text-gray-950 leading-[1.12]">
+                      <motion.h3
+                        variants={textItem}
+                        className="text-2xl md:text-4xl font-semibold tracking-tight text-gray-950 leading-[1.12]"
+                      >
                         {card.title}
-                      </h3>
+                      </motion.h3>
 
-                      <p className="mt-4 text-gray-600 text-base md:text-lg leading-relaxed max-w-xl">
+                      <motion.p
+                        variants={textItem}
+                        className="mt-4 text-gray-600 text-base md:text-lg leading-relaxed max-w-xl"
+                      >
                         {card.desc}
-                      </p>
+                      </motion.p>
 
-                      <div className="mt-8">
+                      <motion.div variants={textItem} className="mt-8">
                         <a
                           href={card.link}
                           className="
@@ -151,13 +192,19 @@ export default function FeaturesStack() {
                             />
                           </svg>
                         </a>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Col image (cadre homogène “app window”) */}
-                <div className="flex-1 w-full relative z-10">
+                {/* Col image (anim légère, rejoue en remontant) */}
+                <motion.div
+                  className="flex-1 w-full relative z-10"
+                  initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
+                  whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  viewport={{ amount: 0.5, once: false }}
+                  transition={{ duration: 0.6, ease: "easeOut", delay: 0.05 }}
+                >
                   <div
                     className="
                       rounded-2xl
@@ -170,7 +217,6 @@ export default function FeaturesStack() {
                       hover:scale-[1.01]
                     "
                   >
-                    {/* top bar façon app */}
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50">
                       <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
                       <span className="h-2.5 w-2.5 rounded-full bg-yellow-300" />
@@ -187,7 +233,7 @@ export default function FeaturesStack() {
                       loading="lazy"
                     />
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
             </div>
           ))}

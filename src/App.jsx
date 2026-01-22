@@ -4,6 +4,7 @@ import FeaturesStack from './components/FeaturesStack';
 import InteractiveFeatures from './components/InteractiveFeatures';
 import ThematicGrid from './components/ThematicGrid';
 import PricingSection from './components/PricingSection';
+import BridgeProof from './components/BridgeProof';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <FeaturesStack />
         <InteractiveFeatures />
         <ThematicGrid />
+        <BridgeProof />
         <PricingSection />
       </main>
     </div>
